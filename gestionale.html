@@ -2,71 +2,114 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>BauSitter - Gestionale</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BauSitter - Pannello Gestione</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Quicksand', sans-serif; background: #f4f7f6; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #10ac84; color: white; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        .total { font-size: 1.5rem; color: #10ac84; font-weight: 700; }
-        .badge { background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+        body { font-family: 'Quicksand', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #2d3436; }
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 20px; }
+        .total-card { background: #10ac84; color: white; padding: 15px 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(16, 172, 132, 0.3); }
+        .total-label { font-size: 0.9rem; opacity: 0.9; }
+        .total-amount { font-size: 1.8rem; font-weight: 700; }
+        .table-container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 15px; text-align: left; font-weight: 700; border-bottom: 2px solid #eee; }
+        td { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        .badge { background: #e3f2fd; color: #1976d2; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; }
+        .client-info { font-weight: 600; }
+        .phone { color: #636e72; font-size: 0.85rem; }
+        .refresh-btn { background: white; border: 2px solid #10ac84; color: #10ac84; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .refresh-btn:hover { background: #10ac84; color: white; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>Prenotazioni Ricevute 🐾</h1>
-    <div class="total">Totale Incasso: <span id="dailyTotal">0€</span></div>
-</div>
+    <div class="header">
+        <div>
+            <h1>Le tue Prenotazioni 🐾</h1>
+            <button class="refresh-btn" onclick="loadData()">Aggiorna Dati</button>
+        </div>
+        <div class="total-card">
+            <div class="total-label">Incasso Totale</div>
+            <div class="total-amount" id="totalDisplay">0€</div>
+        </div>
+    </div>
 
-<div class="card">
-    <table>
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Ora</th>
-                <th>Cliente</th>
-                <th>Cane</th>
-                <th>Durata</th>
-                <th>Prezzo</th>
-                <th>Marina</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
-</div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data e Ora</th>
+                    <th>Cliente</th>
+                    <th>Cane</th>
+                    <th>Durata</th>
+                    <th>Prezzo</th>
+                    <th>Marina</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+    </div>
 
 <script>
-    const SCRIPT_URL = "INSERISCI_QUI_IL_TUO_URL_SCRIPT_GOOGLE";
+    // --- IL TUO LINK AGGIORNATO ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-MNAY7Oq2b_9_UxcrexJvQaafMzUjplAoCEjA1v-2M69ZkxmJom8tWZ9LnXXiCBsP/exec";
 
     async function loadData() {
-        const response = await fetch(SCRIPT_URL);
-        const data = await response.json();
         const tbody = document.getElementById('tableBody');
-        let total = 0;
-        tbody.innerHTML = "";
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">Caricamento in corso...</td></tr>';
         
-        data.forEach(row => {
-            total += parseInt(row.prezzo) || 0;
-            tbody.innerHTML += `
-                <tr>
-                    <td><b>${row.giorno}</b></td>
-                    <td>${row.ora}</td>
-                    <td>${row.nome}<br><small>${row.telefono}</small></td>
-                    <td>${row.cane}</td>
-                    <td><span class="badge">${row.durata}</span></td>
-                    <td style="color:#10ac84; font-weight:700">${row.prezzo}</td>
-                    <td>${row.marina}</td>
-                </tr>
-            `;
-        });
-        document.getElementById('dailyTotal').innerText = total + "€";
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const data = await response.json();
+            
+            let total = 0;
+            tbody.innerHTML = "";
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">Nessuna prenotazione trovata.</td></tr>';
+                return;
+            }
+
+            data.forEach(row => {
+                // Calcola il totale togliendo il simbolo € se presente
+                const priceValue = parseInt(row.prezzo.replace('€', '')) || 0;
+                total += priceValue;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <strong>${row.giorno}</strong><br>
+                            <span style="color:#10ac84">${row.ora}</span>
+                        </td>
+                        <td>
+                            <div class="client-info">${row.nome}</div>
+                            <div class="phone">${row.telefono}</div>
+                        </td>
+                        <td>${row.cane}</td>
+                        <td><span class="badge">${row.durata}</span></td>
+                        <td style="font-weight:700; color:#10ac84">${row.prezzo}</td>
+                        <td>${row.marina || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('totalDisplay').innerText = total + "€";
+
+        } catch (error) {
+            console.error("Errore nel caricamento:", error);
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red">Errore nel caricamento dei dati. Controlla il link di Google Sheets.</td></tr>';
+        }
     }
+
+    // Carica i dati all'apertura
     loadData();
-    setInterval(loadData, 60000); // Aggiorna ogni minuto
+
+    // Auto-aggiornamento ogni 2 minuti
+    setInterval(loadData, 120000);
 </script>
+
 </body>
 </html>
