@@ -111,7 +111,9 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-MNAY7Oq2b_9_UxcrexJvQaafMzUjplAoCEjA1v-2M69ZkxmJom8tWZ9LnXXiCBsP/exec";
+    // IL TUO NUOVO URL CONFIGURATO
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnc-Sz2J2jS_lWWtn031bVs9xSW4CYmrAypSDo5A7Xwr4ofDFBgH-Cs9AxLU8Nr8L5/exec";
+    
     let curMon = 5; 
     const mons = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 
@@ -173,17 +175,11 @@
     function generatePDF() {
         const { jsPDF } = window.jspdf; 
         const doc = new jsPDF();
-        
-        // Titolo
         doc.setFontSize(22);
-        doc.setTextColor(16, 172, 132); // Colore BauSitter
+        doc.setTextColor(16, 172, 132); 
         doc.text("RICEVUTA PRENOTAZIONE BAUSITTER", 20, 25);
-        
-        // Linea separatrice
         doc.setLineWidth(0.5);
         doc.line(20, 30, 190, 30);
-        
-        // Dati Cliente
         doc.setFontSize(14);
         doc.setTextColor(40, 40, 40);
         doc.text("INFORMAZIONI CLIENTE", 20, 45);
@@ -191,8 +187,6 @@
         doc.text("Nome: " + document.getElementById('nome').value, 25, 55);
         doc.text("Telefono: " + document.getElementById('tel').value, 25, 63);
         doc.text("Cane: " + document.getElementById('cane').value, 25, 71);
-        
-        // Dati Servizio
         doc.setFontSize(14);
         doc.text("DETTAGLI SERVIZIO", 20, 85);
         doc.setFontSize(12);
@@ -200,22 +194,16 @@
         doc.text("Ora Inizio: " + document.getElementById('ora').value, 25, 103);
         doc.text("Durata: " + document.getElementById('durata').value + " ora/e", 25, 111);
         doc.text("Marina/Posto: " + (document.getElementById('marina').value || "N/A"), 25, 119);
-        
-        // Prezzo
         doc.setFontSize(16);
         doc.setFont(undefined, 'bold');
         doc.text("TOTALE DA PAGARE: " + document.getElementById('pRes').innerText, 20, 135);
-        
-        // Note
         if(document.getElementById('note').value) {
             doc.setFont(undefined, 'normal');
             doc.setFontSize(12);
             doc.text("NOTE:", 20, 150);
-            doc.setFontSize(10);
             const splitNote = doc.splitTextToSize(document.getElementById('note').value, 160);
             doc.text(splitNote, 25, 160);
         }
-
         doc.save("Ricevuta_BauSitter.pdf");
     }
 
