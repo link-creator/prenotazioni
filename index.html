@@ -4,27 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BauSitter - Prenotazione</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
-        /* (Stessi stili grafici di prima...) */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Quicksand', sans-serif; margin: 0; padding: 0; background-image: linear-gradient(rgba(253, 250, 245, 0.7), rgba(253, 250, 245, 0.7)), url('https://images.unsplash.com/photo-1551730459-92db2a308d6a?auto=format&fit=crop&q=80&w=1600'); background-size: cover; background-attachment: fixed; background-position: center; color: #444; min-height: 100vh; }
+        
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            margin: 0; padding: 0; 
+            background-image: linear-gradient(rgba(253, 250, 245, 0.7), rgba(253, 250, 245, 0.7)), 
+                              url('https://images.unsplash.com/photo-1551730459-92db2a308d6a?auto=format&fit=crop&q=80&w=1600');
+            background-size: cover; background-attachment: fixed; background-position: center;
+            color: #444; min-height: 100vh;
+        }
+
         header { padding: 3rem 1rem 1rem; text-align: center; }
         header h1 { font-size: 2.8rem; margin: 0; font-weight: 700; color: #2d3436; }
-        .container { max-width: 550px; width: 92%; margin: 0 auto 4rem; padding: 2.5rem; background: rgba(255, 255, 255, 0.98); border-radius: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3); position: relative; }
-        #closedNotice { display: none; margin-bottom: 2rem; text-align: center; background: #fff5f5; padding: 1.2rem; border-radius: 25px; border: 2px dashed #ff7675; }
-        .form-title { text-align: center; margin-bottom: 2rem; color: #10ac84; font-weight: 700; font-size: 1.5rem; }
+
+        .container { 
+            max-width: 550px; width: 92%; margin: 0 auto 4rem; padding: 2.5rem; 
+            background: rgba(255, 255, 255, 0.98); border-radius: 40px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+        }
+
+        #closedNotice { 
+            display: none; margin-bottom: 2rem; text-align: center; 
+            background: #fff5f5; padding: 1.2rem; border-radius: 25px; 
+            border: 2px dashed #ff7675; 
+        }
+
         .form-group { margin-bottom: 1.4rem; }
         label { display: block; margin-bottom: 0.6rem; font-weight: 600; color: #2d3436; font-size: 0.95rem; }
-        input, select, textarea { width: 100%; padding: 0.9rem; border: 2px solid #f1f1f1; border-radius: 15px; font-family: inherit; font-size: 16px; background: #fafafa; outline: none; }
+        
+        input, select, textarea { 
+            width: 100%; padding: 0.9rem; border: 2px solid #f1f1f1; 
+            border-radius: 15px; font-family: inherit; font-size: 16px; 
+            background: #fafafa; outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: #10ac84; background: #fff; }
+
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: #f8f9fa; padding: 10px; border-radius: 15px; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
         .cal-cell { padding: 12px 0; border-radius: 12px; font-size: 0.95rem; cursor: pointer; background: #f1f2f6; font-weight: 600; }
-        .cal-cell.selected { background: #10ac84 !important; color: white; }
+        .cal-cell.selected { background: #10ac84 !important; color: white !important; }
+        .cal-cell.closed-day { background: #ffebeb; color: #ff7675; cursor: not-allowed; }
         .cal-btn { background: #fff; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; padding: 8px 15px; font-weight: bold; color: #10ac84; }
-        .submit-btn { background: #10ac84; color: white; border: none; padding: 1.2rem; border-radius: 18px; cursor: pointer; font-size: 1.2rem; font-weight: 700; width: 100%; margin-top: 1rem; }
+
+        .submit-btn { 
+            background: #10ac84; color: white; border: none; padding: 1.2rem; 
+            border-radius: 18px; cursor: pointer; font-size: 1.2rem; 
+            font-weight: 700; width: 100%; margin-top: 1rem; transition: 0.3s;
+        }
+        .submit-btn:disabled { background: #ccc; }
+        .pdf-btn { background: #e67e22; margin-top: 2rem; }
+
+        #secondDogGroup { display: none; }
         .section-divider { margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #f1f1f1; }
         #successScreen { display: none; text-align: center; }
+        .time-hint { font-size: 0.8rem; color: #10ac84; margin-top: 5px; font-weight: 600; }
+        .price-badge { background: #10ac84; color: white; padding: 10px 20px; border-radius: 10px; display: inline-block; margin: 15px 0; font-weight: 700; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -32,10 +73,14 @@
 <header><h1>BauSitter</h1></header>
 
 <div class="container">
+    
     <div id="successScreen">
         <h2 style="color: #2d3436;">Richiesta Inviata! 🐾</h2>
-        <p>Ti ricontatteremo al più presto.</p>
-        <button class="submit-btn" style="background:#95a5a6" onclick="location.reload()">Nuova Prenotazione</button>
+        <p>Prezzo Totale Stimato:</p>
+        <div id="finalPriceDisplay" class="price-badge">0€</div>
+        <p>Grazie per la tua prenotazione.<br>Trovi qui sotto il riepilogo da conservare.</p>
+        <button class="submit-btn pdf-btn" onclick="generatePDF()">📥 Scarica PDF Completo</button>
+        <button class="submit-btn" style="background:#95a5a6" onclick="location.reload()">Torna alla Home</button>
     </div>
 
     <div id="mainContent">
@@ -47,14 +92,17 @@
 
         <form id="bookingForm">
             <div class="form-group"><label>Tuo Nome</label><input type="text" id="inputName" required></div>
+            
             <div class="section-divider">
                 <label>Telefono</label>
                 <div style="display: flex; gap: 10px;">
                     <select style="width: 100px;" id="inputPrefix"><option value="+39">+39</option><option value="+49">+49</option></select>
-                    <input type="tel" id="inputPhone" inputmode="numeric" required>
+                    <input type="tel" id="inputPhone" inputmode="numeric" required oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
             </div>
+
             <div class="form-group" style="margin-top:1.5rem;"><label>Nome del cane</label><input type="text" id="inputDog" required></div>
+            
             <div class="form-group">
                 <label>Quanti cani?</label>
                 <select id="dogCount" onchange="toggleSecondDog()">
@@ -62,10 +110,10 @@
                     <option value="2">2 cani</option>
                 </select>
             </div>
-            <div id="secondDogGroup" style="display:none;" class="form-group"><label>Nome secondo cane</label><input type="text" id="secondDogName"></div>
+            <div id="secondDogGroup" class="form-group"><label>Nome secondo cane</label><input type="text" id="secondDogName"></div>
             
             <div class="form-group">
-                <label>Seleziona Giorno</label>
+                <label>Seleziona Giorno (Lun-Mar Chiuso 🔴)</label>
                 <div class="cal-header">
                     <button type="button" class="cal-btn" id="prevBtn" onclick="moveMonth(-1)">❮</button>
                     <span id="monthLabel" style="font-weight: 700;"></span>
@@ -75,18 +123,34 @@
                 <input type="hidden" id="finalDate" required>
             </div>
 
-            <div class="form-group"><label>Orario</label><input type="time" id="inputTime" required></div>
-            <div class="form-group"><label>Marina / Posto Barca</label><input type="text" id="inputMarina"></div>
-            <div class="form-group"><label>Note</label><textarea rows="2" id="inputNotes"></textarea></div>
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Orario Inizio</label>
+                    <input type="time" id="inputTime" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Durata</label>
+                    <select id="inputDuration" required>
+                        <option value="1">1 Ora (10€)</option>
+                        <option value="2">2 Ore (20€)</option>
+                        <option value="3">3 Ore (25€)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="time-hint" style="margin-top:-10px; margin-bottom:15px;">Fasce: 09:00-12:15 o 15:30-18:30</div>
+
+            <div class="form-group"><label>Marina / Posto Barca</label><input type="text" id="inputMarina" placeholder="Opzionale"></div>
+            <div class="form-group"><label>Note speciali</label><textarea rows="2" id="inputNotes" placeholder="Eventuali intolleranze..."></textarea></div>
             
-            <button type="submit" class="submit-btn" id="btnInvia">Invia Prenotazione</button>
+            <button type="submit" id="submitBtn" class="submit-btn">Invia Prenotazione</button>
         </form>
     </div>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzh-5yHZIXBTxPCSdsr002eIR2owlZ2yrBKSSNWU6Y-ws69xWRC3U4ytK9-WTLybcbL/exec";
-    let currentMonthIndex = 5;
+
+    let currentMonthIndex = 5; 
     const months = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
 
     function renderCal() {
@@ -98,11 +162,15 @@
         const firstDay = new Date(2025, currentMonthIndex, 1).getDay();
         const offset = (firstDay === 0 ? 6 : firstDay - 1);
         for (let i = 0; i < offset; i++) grid.innerHTML += `<div></div>`;
-        for (let d = 1; d <= new Date(2025, currentMonthIndex + 1, 0).getDate(); d++) {
+        const daysInMonth = new Date(2025, currentMonthIndex + 1, 0).getDate();
+        for (let d = 1; d <= daysInMonth; d++) {
             const cell = document.createElement('div');
             cell.className = 'cal-cell';
+            const dayOfWeek = new Date(2025, currentMonthIndex, d).getDay(); 
+            if (dayOfWeek === 1 || dayOfWeek === 2) cell.classList.add('closed-day');
             cell.innerText = d;
             cell.onclick = () => {
+                if(cell.classList.contains('closed-day')) return alert("Siamo chiusi il Lunedì e il Martedì!");
                 document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
                 cell.classList.add('selected');
                 document.getElementById('finalDate').value = d + " " + months[currentMonthIndex] + " 2025";
@@ -114,35 +182,81 @@
     function moveMonth(dir) { currentMonthIndex += dir; renderCal(); }
     function toggleSecondDog() { document.getElementById('secondDogGroup').style.display = (document.getElementById('dogCount').value === "2" ? "block" : "none"); }
 
-    document.getElementById('bookingForm').onsubmit = function(e) {
+    function getPrice(hours) {
+        if(hours == "1") return 10;
+        if(hours == "2") return 20;
+        if(hours == "3") return 25;
+        return 0;
+    }
+
+    window.onload = () => { renderCal(); };
+    
+    document.getElementById('bookingForm').onsubmit = (e) => {
         e.preventDefault();
-        const btn = document.getElementById('btnInvia');
-        btn.innerText = "Invio in corso...";
+        const timeVal = document.getElementById('inputTime').value;
+        const hours = document.getElementById('inputDuration').value;
+        const [h, m] = timeVal.split(':').map(Number);
+        const totalMinutes = h * 60 + m;
+
+        const isMorning = (totalMinutes >= 540 && totalMinutes <= 735); 
+        const isAfternoon = (totalMinutes >= 930 && totalMinutes <= 1110); 
+
+        if (!isMorning && !isAfternoon) return alert("Orario non disponibile! Scegli tra 09:00-12:15 o 15:30-18:30");
+        if(!document.getElementById('finalDate').value) return alert("Seleziona una data!");
+
+        const btn = document.getElementById('submitBtn');
         btn.disabled = true;
+        btn.innerText = "Invio...";
 
-        const data = {
-            nome: document.getElementById('inputName').value,
-            telefono: document.getElementById('inputPrefix').value + " " + document.getElementById('inputPhone').value,
-            cane: document.getElementById('inputDog').value + (document.getElementById('secondDogName').value ? " & " + document.getElementById('secondDogName').value : ""),
-            giorno: document.getElementById('finalDate').value,
-            orario: document.getElementById('inputTime').value,
-            marina: document.getElementById('inputMarina').value,
-            note: document.getElementById('inputNotes').value
-        };
+        const price = getPrice(hours);
+        document.getElementById('finalPriceDisplay').innerText = price + "€";
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).then(() => {
+        const formData = new URLSearchParams();
+        formData.append("nome", document.getElementById('inputName').value);
+        formData.append("telefono", document.getElementById('inputPrefix').value + document.getElementById('inputPhone').value);
+        formData.append("cane", document.getElementById('secondDogName').value ? document.getElementById('inputDog').value + " e " + document.getElementById('secondDogName').value : document.getElementById('inputDog').value);
+        formData.append("giorno", document.getElementById('finalDate').value);
+        formData.append("ora", timeVal + " (" + hours + "h)");
+        formData.append("prezzo", price + "€");
+        formData.append("marina", document.getElementById('inputMarina').value);
+        formData.append("note", document.getElementById('inputNotes').value);
+
+        fetch(SCRIPT_URL, { method: "POST", body: formData, mode: "no-cors" })
+        .then(() => {
             document.getElementById('mainContent').style.display = 'none';
             document.getElementById('successScreen').style.display = 'block';
-        }).catch(err => alert("Errore nell'invio. Riprova."));
+            window.scrollTo(0,0);
+        })
+        .catch(() => {
+            alert("Errore invio!");
+            btn.disabled = false;
+        });
     };
 
-    window.onload = renderCal;
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const hours = document.getElementById('inputDuration').value;
+        const price = getPrice(hours);
+        
+        doc.setFillColor(16, 172, 132); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("BauSitter - Ricevuta", 20, 25);
+        
+        doc.setTextColor(45, 52, 54); doc.setFontSize(12);
+        let y = 60;
+        doc.text(`Nome: ${document.getElementById('inputName').value}`, 20, y); y+=10;
+        doc.text(`Cane/i: ${document.getElementById('inputDog').value}`, 20, y); y+=10;
+        doc.text(`Data: ${document.getElementById('finalDate').value}`, 20, y); y+=10;
+        doc.text(`Ora Inizio: ${document.getElementById('inputTime').value}`, 20, y); y+=10;
+        doc.text(`Durata: ${hours} Ora/e`, 20, y); y+=10;
+        doc.setFont(undefined, 'bold');
+        doc.text(`PREZZO TOTALE: ${price}€`, 20, y); y+=15;
+        doc.setFont(undefined, 'normal');
+        doc.text(`Marina: ${document.getElementById('inputMarina').value || "N/A"}`, 20, y); y+=10;
+        doc.text(`Note: ${document.getElementById('inputNotes').value || "Nessuna"}`, 20, y);
+        
+        doc.save("Ricevuta_BauSitter.pdf");
+    }
 </script>
 </body>
 </html>
