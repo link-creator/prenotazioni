@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BauSitter - Dashboard</title>
+    <title>BauSitter - Dashboard Gestionale</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #10ac84; --secondary: #2bcbba; --danger: #ff4757; --bg: #f0f2f5; }
@@ -22,14 +22,13 @@
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; vertical-align: middle; color: #2d3436; }
         .incasso-box { background: white; color: var(--primary); padding: 15px; border-radius: 15px; text-align: center; min-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .badge-marina { background: #e3fcef; color: #10ac84; padding: 5px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
-        .badge-pontile { background: #f1f2f6; color: #57606f; padding: 5px 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div id="loginScreen">
-    <h2 style="margin-top:0">BauSitter Accesso 🐾</h2>
+    <h2 style="margin-top:0">Accesso Gestionale 🐾</h2>
     <input type="text" id="user" placeholder="Username">
     <input type="password" id="pass" placeholder="Password">
     <button class="btn-login" onclick="login()">Accedi</button>
@@ -37,21 +36,35 @@
 
 <div id="mainContent">
     <div class="nav-bar">
-        <div><h1 style="margin:0;">Dashboard Gestionale</h1><button class="btn-logout" onclick="location.reload()">🚪 Esci</button></div>
+        <div><h1 style="margin:0;">Prenotazioni</h1><button class="btn-logout" onclick="location.reload()">🚪 Esci</button></div>
         <div class="incasso-box"><small>INCASSO TOTALE</small><br><span id="totale" style="font-size: 1.8rem; font-weight: bold;">0€</span></div>
     </div>
     <div class="card">
         <button class="btn-refresh" onclick="caricaDati()">🔄 Aggiorna Lista</button>
         <table>
-            <thead><tr><th>Data</th><th>Ora</th><th>Cliente</th><th>Telefono</th><th>Cane</th><th>Marina</th><th>Pontile</th><th>Prezzo</th><th>Note</th></tr></thead>
-            <tbody id="tabella"><tr><td colspan="9" style="text-align:center;">In attesa di dati da GitHub...</td></tr></tbody>
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Telefono</th>
+                    <th>Cane</th>
+                    <th>Data</th>
+                    <th>Ora</th>
+                    <th>Marina</th>
+                    <th>Pontile</th>
+                    <th>Prezzo</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody id="tabella"><tr><td colspan="9" style="text-align:center;">Caricamento...</td></tr></tbody>
         </table>
     </div>
 </div>
 
 <script>
     const UTENTI = { "tommaso.ballan": "baubau2000", "alessandro.schiavon": "sitterdog2000", "sveva.zoppe": "canedog200" };
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybxESNG80aJNbBVjtWzDi5916VKKHPaPxRv4j_Bp3aN9NnlRSOG6KWuYgQG2kWpPT1/exec";
+    
+    // TUO NUOVO LINK AGGIORNATO
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZjpbutYSh_dDeoNZN1YZ6oEhNUMoky0DI718ivxhnGWWFk_B2sIJlJd64k664vXzw/exec";
 
     function login() {
         const u = document.getElementById('user').value.trim().toLowerCase();
@@ -60,7 +73,7 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             caricaDati();
-        } else { alert("Accesso negato!"); }
+        } else { alert("Dati errati!"); }
     }
 
     function caricaDati() {
@@ -75,28 +88,37 @@
         let totale = 0;
 
         if (data && data.length > 0) {
+            // Mostra le ultime prenotazioni in alto
             data.reverse().forEach(r => {
-                // Pulizia data extra per GitHub Pages
-                let dataVera = r.data || '-';
-                if(dataVera.includes('T')) dataVera = dataVera.split('T')[0].split('-').reverse().join('/');
-
-                // Calcolo incasso
+                // Calcolo Incasso
                 let pVal = parseInt(String(r.prezzo || "0").replace(/[^0-9]/g, '')) || 0;
                 totale += pVal;
 
-                tabella.innerHTML += `<tr>
-                    <td><strong>${dataVera}</strong></td>
-                    <td>${r.ora || '-'}</td>
-                    <td><strong>${r.cliente || '-'}</strong></td>
-                    <td>${r.telefono || '-'}</td>
-                    <td><strong>${r.cane || '-'}</strong></td>
-                    <td><span class="badge-marina">${r.marina || '-'}</span></td>
-                    <td><span class="badge-pontile">${r.pontile || '-'}</span></td>
-                    <td style="color:#10ac84; font-weight:bold;">${r.prezzo || '0'}€</td>
-                    <td style="font-size:0.8rem; color:#636e72;">${r.note || '-'}</td>
-                </tr>`;
+                // Gestione e pulizia data
+                let dataMostra = r.data || '-';
+                if(dataMostra.includes('T')) {
+                    let dObj = new Date(dataMostra);
+                    dObj.setMinutes(dObj.getMinutes() - dObj.getTimezoneOffset());
+                    dataMostra = dObj.toLocaleDateString('it-IT');
+                }
+
+                tabella.innerHTML += `
+                    <tr>
+                        <td><strong>${r.nome || '-'}</strong></td>
+                        <td>${r.telefono || '-'}</td>
+                        <td>${r.cane || '-'}</td>
+                        <td><strong>${dataMostra}</strong></td>
+                        <td>${r.ora || '-'}</td>
+                        <td><span class="badge-marina">${r.marina || '-'}</span></td>
+                        <td>${r.pontile || '-'}</td>
+                        <td style="color:#10ac84; font-weight:bold;">${r.prezzo || '0'}€</td>
+                        <td style="font-size:0.8rem; color:#636e72;">${r.note || '-'}</td>
+                    </tr>
+                `;
             });
             document.getElementById('totale').innerText = totale + "€";
+        } else {
+            tabella.innerHTML = "<tr><td colspan='9' style='text-align:center;'>Nessun dato trovato. Controlla il Foglio Google.</td></tr>";
         }
     };
 </script>
