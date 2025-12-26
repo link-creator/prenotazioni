@@ -72,7 +72,6 @@
         const u = document.getElementById('user').value;
         const p = document.getElementById('pass').value;
 
-        // ELENCO SOCI AUTORIZZATI
         const utenti = [
             { user: "tommaso.ballan", pass: "tommaso.ballan25" },
             { user: "alessandro.schiavon", pass: "alessandro.schiavon25" },
@@ -84,19 +83,13 @@
         if(autorizzato) {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
-            // Pulisce i campi per sicurezza
-            document.getElementById('user').value = "";
-            document.getElementById('pass').value = "";
             loadData();
         } else {
             alert("Username o Password errati!");
         }
     }
 
-    function logout() {
-        // Ricarica la pagina per resettare la sessione
-        location.reload();
-    }
+    function logout() { location.reload(); }
 
     function loadData() {
         const tbody = document.getElementById('tableBody');
@@ -111,10 +104,8 @@
             } else {
                 data.reverse().forEach(row => {
                     let d = new Date(row[0]);
-                    let dataFormattata = d.toLocaleDateString('it-IT');
-                    
                     html += `<tr>
-                        <td style="color: #999;">${dataFormattata}</td>
+                        <td style="color: #999;">${d.toLocaleDateString('it-IT')}</td>
                         <td style="font-weight:700;">${row[1]}</td>
                         <td><a href="tel:${row[2]}" style="text-decoration:none; color:#10ac84;">📞 ${row[2]}</a></td>
                         <td><span class="badge-cane">${row[3]}</span></td>
@@ -127,16 +118,9 @@
             tbody.innerHTML = html;
         })
         .catch(err => {
-            tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:red;'>Errore tecnico nel caricamento dati.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:red;'>Errore nel caricamento. Verifica la connessione.</td></tr>";
         });
     }
-
-    // Invio con tasto Enter
-    document.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter' && document.getElementById('loginSection').style.display !== 'none') {
-            checkLogin();
-        }
-    });
 </script>
 </body>
 </html>
