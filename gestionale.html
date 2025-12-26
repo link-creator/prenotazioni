@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BauSitter - Dashboard Gestionale</title>
+    <title>BauSitter - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #10ac84; --secondary: #2bcbba; --danger: #ff4757; --bg: #f0f2f5; }
@@ -37,47 +37,21 @@
 
 <div id="mainContent">
     <div class="nav-bar">
-        <div>
-            <h1 style="margin:0;">Dashboard Gestionale</h1>
-            <button class="btn-logout" onclick="logout()">🚪 Esci / Logout</button>
-        </div>
-        <div class="incasso-box">
-            <small>INCASSO TOTALE</small><br>
-            <span id="totale" style="font-size: 1.8rem; font-weight: bold;">0€</span>
-        </div>
+        <div><h1 style="margin:0;">Dashboard Gestionale</h1><button class="btn-logout" onclick="location.reload()">🚪 Esci</button></div>
+        <div class="incasso-box"><small>INCASSO TOTALE</small><br><span id="totale" style="font-size: 1.8rem; font-weight: bold;">0€</span></div>
     </div>
-    
     <div class="card">
         <button class="btn-refresh" onclick="caricaDati()">🔄 Aggiorna Lista</button>
         <table>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Ora</th>
-                    <th>Cliente</th>
-                    <th>Telefono</th>
-                    <th>Cane</th>
-                    <th>Marina</th>
-                    <th>Pontile</th>
-                    <th>Prezzo</th>
-                    <th>Note</th>
-                </tr>
-            </thead>
-            <tbody id="tabella">
-                <tr><td colspan="9" style="text-align:center; padding:30px;">In attesa di caricamento...</td></tr>
-            </tbody>
+            <thead><tr><th>Data</th><th>Ora</th><th>Cliente</th><th>Telefono</th><th>Cane</th><th>Marina</th><th>Pontile</th><th>Prezzo</th><th>Note</th></tr></thead>
+            <tbody id="tabella"><tr><td colspan="9" style="text-align:center;">In attesa di dati da GitHub...</td></tr></tbody>
         </table>
     </div>
 </div>
 
 <script>
-    const UTENTI = { 
-        "tommaso.ballan": "baubau2000", 
-        "alessandro.schiavon": "sitterdog2000", 
-        "sveva.zoppe": "canedog200" 
-    };
-
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4-Sr0PS6llloEuAjILTdbU40epCxQME2g6_KAOnQYMsO0vxJ3XvS2lLZ_VmxwhJ6z/exec";
+    const UTENTI = { "tommaso.ballan": "baubau2000", "alessandro.schiavon": "sitterdog2000", "sveva.zoppe": "canedog200" };
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybxESNG80aJNbBVjtWzDi5916VKKHPaPxRv4j_Bp3aN9NnlRSOG6KWuYgQG2kWpPT1/exec";
 
     function login() {
         const u = document.getElementById('user').value.trim().toLowerCase();
@@ -85,21 +59,11 @@
         if (UTENTI[u] && UTENTI[u] === p) {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
-            document.body.style.background = "#f0f2f5";
             caricaDati();
-        } else {
-            alert("Username o Password errati!");
-        }
-    }
-
-    function logout() {
-        if(confirm("Vuoi uscire?")) { location.reload(); }
+        } else { alert("Accesso negato!"); }
     }
 
     function caricaDati() {
-        const tabella = document.getElementById('tabella');
-        tabella.innerHTML = "<tr><td colspan='9' style='text-align:center;'>Recupero dati in corso...</td></tr>";
-        
         const script = document.createElement('script');
         script.src = SCRIPT_URL + "?callback=callbackGestionale&t=" + new Date().getTime();
         document.body.appendChild(script);
@@ -112,31 +76,29 @@
 
         if (data && data.length > 0) {
             data.reverse().forEach(r => {
-                let pStr = String(r.prezzo || "0");
-                let pVal = parseInt(pStr.replace(/[^0-9]/g, '')) || 0;
+                // Pulizia data extra per GitHub Pages
+                let dataVera = r.data || '-';
+                if(dataVera.includes('T')) dataVera = dataVera.split('T')[0].split('-').reverse().join('/');
+
+                // Calcolo incasso
+                let pVal = parseInt(String(r.prezzo || "0").replace(/[^0-9]/g, '')) || 0;
                 totale += pVal;
 
-                // Forza l'ordine delle colonne seguendo i titoli del tuo Sheets
-                tabella.innerHTML += `
-                    <tr>
-                        <td><strong>${r.data || '-'}</strong></td>
-                        <td>${r.ora || '-'}</td>
-                        <td><strong>${r.cliente || '-'}</strong></td>
-                        <td style="color:#10ac84; font-weight:600;">${r.telefono || '-'}</td>
-                        <td><strong>${r.cane || '-'}</strong></td>
-                        <td><span class="badge-marina">${r.marina || '-'}</span></td>
-                        <td><span class="badge-pontile">${r.pontile || '-'}</span></td>
-                        <td><span style="color:#10ac84; font-weight:bold;">${r.prezzo || '0€'}</span></td>
-                        <td style="font-size:0.8rem; color:#636e72;">${r.note || '-'}</td>
-                    </tr>
-                `;
+                tabella.innerHTML += `<tr>
+                    <td><strong>${dataVera}</strong></td>
+                    <td>${r.ora || '-'}</td>
+                    <td><strong>${r.cliente || '-'}</strong></td>
+                    <td>${r.telefono || '-'}</td>
+                    <td><strong>${r.cane || '-'}</strong></td>
+                    <td><span class="badge-marina">${r.marina || '-'}</span></td>
+                    <td><span class="badge-pontile">${r.pontile || '-'}</span></td>
+                    <td style="color:#10ac84; font-weight:bold;">${r.prezzo || '0'}€</td>
+                    <td style="font-size:0.8rem; color:#636e72;">${r.note || '-'}</td>
+                </tr>`;
             });
             document.getElementById('totale').innerText = totale + "€";
-        } else {
-            tabella.innerHTML = "<tr><td colspan='9' style='text-align:center;'>Nessun dato trovato o errore di caricamento.</td></tr>";
         }
     };
 </script>
-
 </body>
 </html>
