@@ -1,100 +1,261 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BauSitter - Gestionale</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Dog Sitting Luxury</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #10ac84; --bg: #f0f2f5; }
-        body { font-family: 'Quicksand', sans-serif; background: linear-gradient(135deg, #10ac84 0%, #2bcbba 100%); margin: 0; min-height: 100vh; padding: 20px; display: flex; justify-content: center; }
-        .card { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 1200px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow-x: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #888; font-size: 0.8rem; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #2d3436; }
-        .incasso { background: #f8f9fa; padding: 10px 20px; border-radius: 15px; text-align: center; border: 1px solid #eee; }
-        button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        :root { --primary-color: #4a7c59; --secondary-color: #faf3dd; --accent-color: #d4a373; --danger-color: #e63946; --white: #ffffff; --status-ok: #2d6a4f; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--secondary-color); color: #333; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .lang-container { align-self: flex-end; margin-bottom: 20px; background: white; padding: 8px 15px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; }
+        #langSelect { border: none; font-weight: 600; cursor: pointer; outline: none; background: transparent; }
+        .status-box { width: 100%; max-width: 500px; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 10px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .status-open { background-color: #d8f3dc; color: var(--status-ok); border: 2px solid var(--status-ok); }
+        .status-closed { background-color: #ffdce0; color: var(--danger-color); border: 2px solid var(--danger-color); }
+        .hours-table { width: 100%; max-width: 500px; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
+        th { color: var(--primary-color); }
+        .container { background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
+        h1 { color: var(--primary-color); text-align: center; margin-bottom: 30px; font-weight: 600; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: inherit; }
+        .hidden { display: none; }
+        .calendar-wrapper { border: 1px solid #eee; border-radius: 15px; padding: 15px; background: #fdfdfd; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-header button { background: var(--primary-color); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .day { padding: 10px 0; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .day.header { font-weight: bold; color: #999; }
+        .day.disabled { background-color: #ffe5e5; color: var(--danger-color); font-weight: bold; }
+        .day.selected { background-color: var(--primary-color) !important; color: white; }
+        .btn-submit { background-color: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 50px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 20px; }
+        .btn-pdf { background-color: var(--accent-color); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 380px; }
+        .price-tag { font-size: 28px; font-weight: bold; color: var(--primary-color); margin: 15px 0; }
+        .time-error { color: var(--danger-color); font-size: 12px; margin-top: 5px; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="header">
-        <div>
-            <h1 style="margin:0;">Prenotazioni 🐾</h1>
-            <button onclick="caricaDati()">🔄 Aggiorna Lista</button>
-        </div>
-        <div class="incasso">
-            <small>INCASSO TOTALE</small><br>
-            <span id="totale" style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">0€</span>
+    <div class="lang-container">
+        <span id="langLabel">Language:</span>
+        <select id="langSelect" onchange="changeLanguage()">
+            <option value="en" selected>English</option>
+            <option value="it">Italiano</option>
+        </select>
+    </div>
+
+    <div id="statusMessage" class="status-box"></div>
+
+    <div class="hours-table">
+        <h3 id="tableTitle" style="margin-top:0; color:var(--primary-color); font-size: 16px;">Business Hours</h3>
+        <table>
+            <tr><th id="thDays">Days</th><th id="thHours">Hours</th></tr>
+            <tr><td id="tdMonTue">Mon - Tue</td><td style="color:var(--danger-color); font-weight:bold;" id="tdClosed">CLOSED</td></tr>
+            <tr><td id="tdWedSun">Wed - Sun</td><td>09:30 - 12:30 / 15:30 - 18:30</td></tr>
+        </table>
+    </div>
+
+    <div class="container">
+        <h1 id="title">🐾 Dog Sitting Luxury</h1>
+        <form id="bookingForm">
+            <div class="form-group"><label id="lblFullname">Full Name</label><input type="text" id="fullname" placeholder="John Doe" required></div>
+            
+            <div class="form-group"><label id="lblPhone">Phone Number</label><input type="tel" id="phone" placeholder="+39 123 456 7890" required></div>
+            
+            <div class="form-group"><label id="lblDuration">How long do you need the service?</label><select id="duration"><option value="1" id="opt1h">1 hour</option><option value="2" id="opt2h">2 hours</option><option value="3" id="opt3h">3 hours</option></select></div>
+            <div class="form-group"><label id="lblDogs">How many dogs do you have?</label><select id="dogCount" onchange="toggleDogNames()"><option value="1" id="opt1d">1 dog</option><option value="2" id="opt2d">2 dogs</option></select></div>
+            <div class="form-group"><input type="text" id="dog1" placeholder="Dog's name" required></div>
+            <div class="form-group hidden" id="extraDog"><input type="text" id="dog2" placeholder="Second dog's name"></div>
+            
+            <div class="form-group"><label id="lblDate">Choose the day</label><div class="calendar-wrapper"><div class="calendar-header"><button type="button" onclick="changeMonth(-1)">❮</button><span id="monthDisplay"></span><button type="button" onclick="changeMonth(1)">❯</button></div><div class="calendar-grid" id="calendarGrid"></div></div><input type="hidden" id="selectedDate" required></div>
+            
+            <div class="form-group">
+                <label id="lblStartTime">Start time</label>
+                <input type="time" id="startTime" required>
+                <div id="timeError" class="time-error"></div>
+            </div>
+
+            <div class="form-group"><label id="lblMarina">Which Marina are you in?</label><input type="text" id="marina" required></div>
+            <div class="form-group"><label id="lblPontile">Which pier are you at?</label><input type="text" id="pontile" required></div>
+            <div class="form-group"><label id="lblNotes">Notes</label><textarea id="notes" rows="2"></textarea></div>
+            
+            <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">Send Form</button>
+        </form>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2 id="successTitle">Booking Sent!</h2>
+            <div id="finalPrice" class="price-tag"></div>
+            <button class="btn-pdf" id="btnPdf" onclick="downloadPDF()">Download PDF Report</button>
+            <button class="btn-submit" onclick="location.reload()">Close</button>
         </div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Cliente</th>
-                <th>Telefono</th>
-                <th>Cane</th>
-                <th>Data</th>
-                <th>Ora</th>
-                <th>Marina</th>
-                <th>Pontile</th>
-                <th>Prezzo</th>
-                <th>Note</th>
-            </tr>
-        </thead>
-        <tbody id="tabella">
-            <tr><td colspan="9" style="text-align:center;">Caricamento...</td></tr>
-        </tbody>
-    </table>
-</div>
-
 <script>
-    // IL TUO NUOVO LINK
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypU86oz5jZqewsnUOuvlJ5DaA2borgn6WUb_VGUs-2Hevg0eUUMG1SjG523UlzINMU/exec";
-
-    function caricaDati() {
-        const script = document.createElement('script');
-        script.src = SCRIPT_URL + "?callback=mostraDati&t=" + new Date().getTime();
-        document.body.appendChild(script);
-    }
-
-    window.mostraDati = function(data) {
-        const tbody = document.getElementById('tabella');
-        tbody.innerHTML = "";
-        let totale = 0;
-
-        if (data && data.length > 0) {
-            // Mostra le ultime prenotazioni per prime
-            data.reverse().forEach(r => {
-                // Somma incasso (toglie € se presente)
-                let p = parseInt(String(r.prezzo || "0").replace(/[^0-9]/g, '')) || 0;
-                totale += p;
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${r.nome || '-'}</strong></td>
-                        <td>${r.telefono || '-'}</td>
-                        <td>${r.cane || '-'}</td>
-                        <td><strong>${r.data || '-'}</strong></td>
-                        <td>${r.ora || '-'}</td>
-                        <td>${r.marina || '-'}</td>
-                        <td>${r.pontile || '-'}</td>
-                        <td style="color:#10ac84; font-weight:bold;">${r.prezzo || '0'}€</td>
-                        <td style="font-size:0.8rem; color:#636e72;">${r.note || '-'}</td>
-                    </tr>
-                `;
-            });
-            document.getElementById('totale').innerText = totale + "€";
-        } else {
-            tbody.innerHTML = "<tr><td colspan='9' style='text-align:center;'>Nessun dato. Assicurati che il foglio Google non sia vuoto.</td></tr>";
-        }
+    const translations = {
+        en: { langLabel: "Language:", title: "🐾 Dog Sitting Luxury", lblFullname: "Full Name", lblPhone: "Phone Number", lblDuration: "How long?", opt1h: "1 hour", opt2h: "2 hours", opt3h: "3 hours", lblDogs: "How many dogs?", opt1d: "1 dog", opt2d: "2 dogs", dog1Place: "Dog's name", dog2Place: "Second dog's name", lblDate: "Choose the date", lblStartTime: "Start time", lblMarina: "Which Marina?", lblPontile: "Which pier?", lblNotes: "Notes", btnSubmit: "Send Form", successTitle: "Booking Sent!", btnPdf: "Download PDF Report", timeErrorMsg: "Error: Service available only 09:30-12:30 and 15:30-18:30", months: ["June 2024", "July 2024", "August 2024"], statusOpen: "We are Open!", statusClosed: "Service closed", tableTitle: "Business Hours", thDays: "Days", thHours: "Hours", tdMonTue: "Mon - Tue", tdWedSun: "Wed - Sun", tdClosed: "CLOSED", closedMsg: "Service closed Mon-Tue" },
+        it: { langLabel: "Lingua:", title: "🐾 Dog Sitting Luxury", lblFullname: "Nome e Cognome", lblPhone: "Numero di Telefono", lblDuration: "Quanto vuoi il servizio?", opt1h: "1 ora", opt2h: "2 ore", opt3h: "3 ore", lblDogs: "Quanti cani hai?", opt1d: "1 cane", opt2d: "2 cani", dog1Place: "Nome del cane", dog2Place: "Nome del secondo cane", lblDate: "Scegli il giorno", lblStartTime: "Ora d'inizio", lblMarina: "Di che marina sei?", lblPontile: "Di quale pontile sei?", lblNotes: "Note", btnSubmit: "Invia Modulo", successTitle: "Prenotazione Inviata!", btnPdf: "Scarica Resoconto PDF", timeErrorMsg: "Errore: Servizio attivo solo 09:30-12:30 e 15:30-18:30", months: ["Giugno 2024", "Luglio 2024", "Agosto 2024"], statusOpen: "Siamo Aperti!", statusClosed: "Servizio chiuso", tableTitle: "Orari del Servizio", thDays: "Giorni", thHours: "Orari", tdMonTue: "Lun - Mar", tdWedSun: "Mer - Dom", tdClosed: "CHIUSO", closedMsg: "Servizio chiuso Lunedì e Martedì" }
     };
 
-    caricaDati();
-</script>
+    let currentLang = 'en';
+    let currentMonthIdx = 0;
 
+    function checkStatus() {
+        const now = new Date();
+        const day = now.getDay();
+        const hour = now.getHours() + (now.getMinutes() / 60);
+        const t = translations[currentLang];
+        let isOpen = (day !== 1 && day !== 2) && ((hour >= 9.5 && hour <= 12.5) || (hour >= 15.5 && hour <= 18.5));
+        const box = document.getElementById('statusMessage');
+        box.innerText = isOpen ? t.statusOpen : t.statusClosed;
+        box.className = "status-box " + (isOpen ? "status-open" : "status-closed");
+    }
+
+    function changeLanguage() {
+        currentLang = document.getElementById('langSelect').value;
+        const t = translations[currentLang];
+        document.getElementById('langLabel').innerText = t.langLabel;
+        document.getElementById('title').innerText = t.title;
+        document.getElementById('lblFullname').innerText = t.lblFullname;
+        document.getElementById('lblPhone').innerText = t.lblPhone;
+        document.getElementById('lblDuration').innerText = t.lblDuration;
+        document.getElementById('opt1h').innerText = t.opt1h;
+        document.getElementById('opt2h').innerText = t.opt2h;
+        document.getElementById('opt3h').innerText = t.opt3h;
+        document.getElementById('lblDogs').innerText = t.lblDogs;
+        document.getElementById('opt1d').innerText = t.opt1d;
+        document.getElementById('opt2d').innerText = t.opt2d;
+        document.getElementById('dog1').placeholder = t.dog1Place;
+        document.getElementById('dog2').placeholder = t.dog2Place;
+        document.getElementById('lblDate').innerText = t.lblDate;
+        document.getElementById('lblStartTime').innerText = t.lblStartTime;
+        document.getElementById('lblMarina').innerText = t.lblMarina;
+        document.getElementById('lblPontile').innerText = t.lblPontile;
+        document.getElementById('lblNotes').innerText = t.lblNotes;
+        document.getElementById('btnSubmit').innerText = t.btnSubmit;
+        document.getElementById('successTitle').innerText = t.successTitle;
+        document.getElementById('btnPdf').innerText = t.btnPdf;
+        document.getElementById('tableTitle').innerText = t.tableTitle;
+        document.getElementById('thDays').innerText = t.thDays;
+        document.getElementById('thHours').innerText = t.thHours;
+        document.getElementById('tdMonTue').innerText = t.tdMonTue;
+        document.getElementById('tdWedSun').innerText = t.tdWedSun;
+        document.getElementById('tdClosed').innerText = t.tdClosed;
+        checkStatus();
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const display = document.getElementById('monthDisplay');
+        const configs = [{d:30, o:5}, {d:31, o:0}, {d:31, o:3}];
+        const m = configs[currentMonthIdx];
+        const t = translations[currentLang];
+        display.innerText = t.months[currentMonthIdx];
+        grid.innerHTML = '';
+        ['L','M','M','G','V','S','D'].forEach(d => grid.innerHTML += `<div class="day header">${d}</div>`);
+        for(let i=0; i<m.o; i++) grid.innerHTML += `<div class="day empty"></div>`;
+        for(let d=1; d<=m.d; d++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'day';
+            dayDiv.innerText = d;
+            const dw = (m.o + d - 1) % 7;
+            if(dw === 0 || dw === 1) {
+                dayDiv.classList.add('disabled');
+                dayDiv.onclick = () => alert(t.closedMsg);
+            } else {
+                dayDiv.onclick = function() {
+                    document.querySelectorAll('.day').forEach(el => el.classList.remove('selected'));
+                    dayDiv.classList.add('selected');
+                    document.getElementById('selectedDate').value = `${d} ${t.months[currentMonthIdx]}`;
+                };
+            }
+            grid.appendChild(dayDiv);
+        }
+    }
+
+    function changeMonth(dir) { currentMonthIdx = Math.max(0, Math.min(2, currentMonthIdx + dir)); renderCalendar(); }
+    function toggleDogNames() { document.getElementById('extraDog').classList.toggle('hidden', document.getElementById('dogCount').value === "1"); }
+
+    async function submitForm() {
+        const t = translations[currentLang];
+        const selectedDate = document.getElementById('selectedDate').value;
+        const startTime = document.getElementById('startTime').value;
+        const errorDiv = document.getElementById('timeError');
+
+        if(!selectedDate) return alert(currentLang === 'it' ? "Scegli un giorno!" : "Select a date!");
+
+        const timeParts = startTime.split(':');
+        const hour = parseInt(timeParts[0]) + (parseInt(timeParts[1]) / 60);
+        const isTimeValid = (hour >= 9.5 && hour <= 12.5) || (hour >= 15.5 && hour <= 18.5);
+
+        if(!isTimeValid) {
+            errorDiv.innerText = t.timeErrorMsg;
+            errorDiv.style.display = 'block';
+            document.getElementById('startTime').style.borderColor = 'var(--danger-color)';
+            return;
+        } else {
+            errorDiv.style.display = 'none';
+            document.getElementById('startTime').style.borderColor = '#ddd';
+        }
+
+        const duration = document.getElementById('duration').value;
+        const price = duration == "1" ? "10€" : duration == "2" ? "20€" : "25€";
+        
+        const formData = {
+            fullname: document.getElementById('fullname').value,
+            phone: document.getElementById('phone').value,
+            duration: duration + " ore",
+            dogCount: document.getElementById('dogCount').value,
+            dogNames: document.getElementById('dog1').value + (document.getElementById('dog2').value ? ", " + document.getElementById('dog2').value : ""),
+            selectedDate: selectedDate,
+            startTime: startTime,
+            marina: document.getElementById('marina').value,
+            pontile: document.getElementById('pontile').value,
+            notes: document.getElementById('notes').value,
+            price: price
+        };
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwPP-RM3qo2VcTal_xfk-ZfqwxO5UDOWInyXcOf8RKoDe1NXwH_ByjI3B91eMjdHtJj/exec';
+
+        try {
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(formData) });
+            document.getElementById('finalPrice').innerText = price;
+            document.getElementById('successModal').style.display = 'flex';
+        } catch (e) { alert("Error sending!"); }
+    }
+
+    function downloadPDF() {
+        const content = `
+BOOKING REPORT - DOG SITTING LUXURY
+------------------------------------------
+Client: ${document.getElementById('fullname').value}
+Phone: ${document.getElementById('phone').value}
+Date: ${document.getElementById('selectedDate').value}
+Start Time: ${document.getElementById('startTime').value}
+Duration: ${document.getElementById('duration').value} hour(s)
+Dogs: ${document.getElementById('dogCount').value} (${document.getElementById('dog1').value}${document.getElementById('dog2').value ? ', ' + document.getElementById('dog2').value : ''})
+Marina: ${document.getElementById('marina').value}
+Pier: ${document.getElementById('pontile').value}
+Price: ${document.getElementById('finalPrice').innerText}
+------------------------------------------
+Thank you for choosing Dog Sitting Luxury!
+        `;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Booking_${document.getElementById('fullname').value}.txt`;
+        link.click();
+    }
+
+    changeLanguage();
+    setInterval(checkStatus, 60000);
+</script>
 </body>
 </html>
