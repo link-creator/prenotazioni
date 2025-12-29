@@ -5,38 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dog Sitting Luxury</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
         :root { --primary-color: #4a7c59; --secondary-color: #faf3dd; --accent-color: #d4a373; --danger-color: #e63946; --white: #ffffff; --status-ok: #2d6a4f; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--secondary-color); color: #333; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        .lang-container { align-self: flex-end; margin-bottom: 20px; background: white; padding: 8px 15px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--secondary-color);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 100 100'%3E%3Cpath d='M30.5,45.3c3.4,0,6.1-4.8,6.1-10.7s-2.7-10.7-6.1-10.7s-6.1,4.8-6.1,10.7S27.1,45.3,30.5,45.3z M44.2,34.1 c3.4,0,6.1-4.8,6.1-10.7S47.6,12.7,44.2,12.7s-6.1,4.8-6.1,10.7S40.8,34.1,44.2,34.1z M58.2,34.1c3.4,0,6.1-4.8,6.1-10.7 S61.6,12.7,58.2,12.7s-6.1,4.8-6.1,10.7S54.8,34.1,58.2,34.1z M71.5,45.3c3.4,0,6.1-4.8,6.1-10.7s-2.7-10.7-6.1-10.7 s-6.1,4.8-6.1,10.7S68.1,45.3,71.5,45.3z M51,48c-9,0-17,7.2-17,16.2c0,4.2,1.3,8.1,3.5,11.2c2.4,3.4,6.5,7.5,10.5,10.7 c2,1.6,4.3,2.4,6.5,2.4s4.5-0.8,6.5-2.4c4-3.2,8.1-7.3,10.5-10.7c2.2-3.1,3.5-7,3.5-11.2C65,55.2,58,48,51,48z' fill='%23d4a373' fill-opacity='0.15'/%3E%3C/svg%3E");
+            color: #333; display: flex; flex-direction: column; align-items: center; padding: 20px 10px; margin: 0; 
+        }
+
+        .lang-container { align-self: flex-end; margin-bottom: 20px; background: white; padding: 8px 15px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; z-index: 10; }
         #langSelect { border: none; font-weight: 600; cursor: pointer; outline: none; background: transparent; }
-        .status-box { width: 100%; max-width: 500px; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 10px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        .status-box { width: 100%; max-width: 500px; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 10px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); box-sizing: border-box; background: white; z-index: 10; }
         .status-open { background-color: #d8f3dc; color: var(--status-ok); border: 2px solid var(--status-ok); }
         .status-closed { background-color: #ffdce0; color: var(--danger-color); border: 2px solid var(--danger-color); }
-        .hours-table { width: 100%; max-width: 500px; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
+
+        .hours-table { width: 92%; max-width: 500px; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin: 0 auto 25px auto; box-sizing: border-box; position: relative; z-index: 10; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
         th { color: var(--primary-color); }
-        .container { background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; width: 100%; }
-        h1 { color: var(--primary-color); text-align: center; margin-bottom: 30px; font-weight: 600; }
+
+        .container { background: var(--white); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 500px; width: 92%; box-sizing: border-box; margin-bottom: 30px; position: relative; z-index: 10; }
+
+        h1 { color: var(--primary-color); text-align: center; margin-bottom: 30px; font-weight: 600; font-size: 24px; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: inherit; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-family: inherit; font-size: 16px; background: #fff; } 
+        
         .hidden { display: none; }
-        .calendar-wrapper { border: 1px solid #eee; border-radius: 15px; padding: 15px; background: #fdfdfd; }
+        .calendar-wrapper { border: 1px solid #eee; border-radius: 15px; padding: 10px; background: #fdfdfd; }
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .calendar-header button { background: var(--primary-color); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .day { padding: 10px 0; border-radius: 8px; cursor: pointer; font-size: 13px; }
+        .day { padding: 8px 0; border-radius: 8px; cursor: pointer; font-size: 12px; }
         .day.header { font-weight: bold; color: #999; }
         .day.disabled { background-color: #ffe5e5; color: var(--danger-color); font-weight: bold; }
         .day.selected { background-color: var(--primary-color) !important; color: white; }
-        .btn-submit { background-color: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 50px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 20px; }
+
+        .btn-submit { background-color: var(--primary-color); color: white; border: none; padding: 15px; border-radius: 50px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; margin-top: 10px; }
         .btn-pdf { background-color: var(--accent-color); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 380px; }
-        .price-tag { font-size: 28px; font-weight: bold; color: var(--primary-color); margin: 15px 0; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 10px; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 380px; width: 100%; box-sizing: border-box; }
+        .price-tag { font-size: 28px; font-weight: bold; color: var(--primary-color); margin: 10px 0; }
+        .meeting-info { font-size: 14px; color: #666; font-style: italic; margin-bottom: 20px; }
         .time-error { color: var(--danger-color); font-size: 12px; margin-top: 5px; font-weight: bold; display: none; }
+
+        @media (max-width: 380px) { .container { padding: 20px; } h1 { font-size: 20px; } .day { font-size: 11px; } }
     </style>
 </head>
 <body>
@@ -52,7 +71,7 @@
     <div id="statusMessage" class="status-box"></div>
 
     <div class="hours-table">
-        <h3 id="tableTitle" style="margin-top:0; color:var(--primary-color); font-size: 16px;">Business Hours</h3>
+        <h3 id="tableTitle" style="margin-top:0; color:var(--primary-color); font-size: 16px; text-align: center;">Business Hours</h3>
         <table>
             <tr><th id="thDays">Days</th><th id="thHours">Hours</th></tr>
             <tr><td id="tdMonTue">Mon - Tue</td><td style="color:var(--danger-color); font-weight:bold;" id="tdClosed">CLOSED</td></tr>
@@ -64,26 +83,20 @@
         <h1 id="title">🐾 Dog Sitting Luxury</h1>
         <form id="bookingForm">
             <div class="form-group"><label id="lblFullname">Full Name</label><input type="text" id="fullname" placeholder="John Doe" required></div>
-            
             <div class="form-group"><label id="lblPhone">Phone Number</label><input type="tel" id="phone" placeholder="+39 123 456 7890" required></div>
-            
-            <div class="form-group"><label id="lblDuration">How long do you need the service?</label><select id="duration"><option value="1" id="opt1h">1 hour</option><option value="2" id="opt2h">2 hours</option><option value="3" id="opt3h">3 hours</option></select></div>
-            <div class="form-group"><label id="lblDogs">How many dogs do you have?</label><select id="dogCount" onchange="toggleDogNames()"><option value="1" id="opt1d">1 dog</option><option value="2" id="opt2d">2 dogs</option></select></div>
+            <div class="form-group"><label id="lblDuration">Duration</label><select id="duration"><option value="1" id="opt1h">1 hour</option><option value="2" id="opt2h">2 hours</option><option value="3" id="opt3h">3 hours</option></select></div>
+            <div class="form-group"><label id="lblDogs">Dogs</label><select id="dogCount" onchange="toggleDogNames()"><option value="1" id="opt1d">1 dog</option><option value="2" id="opt2d">2 dogs</option></select></div>
             <div class="form-group"><input type="text" id="dog1" placeholder="Dog's name" required></div>
             <div class="form-group hidden" id="extraDog"><input type="text" id="dog2" placeholder="Second dog's name"></div>
-            
             <div class="form-group"><label id="lblDate">Choose the day</label><div class="calendar-wrapper"><div class="calendar-header"><button type="button" onclick="changeMonth(-1)">❮</button><span id="monthDisplay"></span><button type="button" onclick="changeMonth(1)">❯</button></div><div class="calendar-grid" id="calendarGrid"></div></div><input type="hidden" id="selectedDate" required></div>
-            
             <div class="form-group">
                 <label id="lblStartTime">Start time</label>
                 <input type="time" id="startTime" required>
                 <div id="timeError" class="time-error"></div>
             </div>
-
-            <div class="form-group"><label id="lblMarina">Which Marina are you in?</label><input type="text" id="marina" required></div>
-            <div class="form-group"><label id="lblPontile">Which pier are you at?</label><input type="text" id="pontile" required></div>
+            <div class="form-group"><label id="lblPort">Port</label><input type="text" id="port" required></div>
+            <div class="form-group"><label id="lblPontile">Pier</label><input type="text" id="pontile" required></div>
             <div class="form-group"><label id="lblNotes">Notes</label><textarea id="notes" rows="2"></textarea></div>
-            
             <button type="button" id="btnSubmit" class="btn-submit" onclick="submitForm()">Send Form</button>
         </form>
     </div>
@@ -92,6 +105,7 @@
         <div class="modal-content">
             <h2 id="successTitle">Booking Sent!</h2>
             <div id="finalPrice" class="price-tag"></div>
+            <div id="meetingInfo" class="meeting-info"></div>
             <button class="btn-pdf" id="btnPdf" onclick="downloadPDF()">Download PDF Report</button>
             <button class="btn-submit" onclick="location.reload()">Close</button>
         </div>
@@ -99,8 +113,8 @@
 
 <script>
     const translations = {
-        en: { langLabel: "Language:", title: "🐾 Dog Sitting Luxury", lblFullname: "Full Name", lblPhone: "Phone Number", lblDuration: "How long?", opt1h: "1 hour", opt2h: "2 hours", opt3h: "3 hours", lblDogs: "How many dogs?", opt1d: "1 dog", opt2d: "2 dogs", dog1Place: "Dog's name", dog2Place: "Second dog's name", lblDate: "Choose the date", lblStartTime: "Start time", lblMarina: "Which Marina?", lblPontile: "Which pier?", lblNotes: "Notes", btnSubmit: "Send Form", successTitle: "Booking Sent!", btnPdf: "Download PDF Report", timeErrorMsg: "Error: Service available only 09:30-12:30 and 15:30-18:30", months: ["June 2024", "July 2024", "August 2024"], statusOpen: "We are Open!", statusClosed: "Service closed", tableTitle: "Business Hours", thDays: "Days", thHours: "Hours", tdMonTue: "Mon - Tue", tdWedSun: "Wed - Sun", tdClosed: "CLOSED", closedMsg: "Service closed Mon-Tue" },
-        it: { langLabel: "Lingua:", title: "🐾 Dog Sitting Luxury", lblFullname: "Nome e Cognome", lblPhone: "Numero di Telefono", lblDuration: "Quanto vuoi il servizio?", opt1h: "1 ora", opt2h: "2 ore", opt3h: "3 ore", lblDogs: "Quanti cani hai?", opt1d: "1 cane", opt2d: "2 cani", dog1Place: "Nome del cane", dog2Place: "Nome del secondo cane", lblDate: "Scegli il giorno", lblStartTime: "Ora d'inizio", lblMarina: "Di che marina sei?", lblPontile: "Di quale pontile sei?", lblNotes: "Note", btnSubmit: "Invia Modulo", successTitle: "Prenotazione Inviata!", btnPdf: "Scarica Resoconto PDF", timeErrorMsg: "Errore: Servizio attivo solo 09:30-12:30 e 15:30-18:30", months: ["Giugno 2024", "Luglio 2024", "Agosto 2024"], statusOpen: "Siamo Aperti!", statusClosed: "Servizio chiuso", tableTitle: "Orari del Servizio", thDays: "Giorni", thHours: "Orari", tdMonTue: "Lun - Mar", tdWedSun: "Mer - Dom", tdClosed: "CHIUSO", closedMsg: "Servizio chiuso Lunedì e Martedì" }
+        en: { langLabel: "Language:", title: "🐾 Dog Sitting Luxury", lblFullname: "Full Name", lblPhone: "Phone Number", lblDuration: "Duration", opt1h: "1 hour", opt2h: "2 hours", opt3h: "3 hours", lblDogs: "Dogs", opt1d: "1 dog", opt2d: "2 dogs", dog1Place: "Dog's name", dog2Place: "Second dog's name", lblDate: "Date", lblStartTime: "Start time", lblPort: "Port", lblPontile: "Pier", lblNotes: "Notes", btnSubmit: "Send Form", successTitle: "Booking Sent!", btnPdf: "Download PDF Report", timeErrorMsg: "Error: Service available only 09:30-12:30 and 15:30-18:30", months: ["June 2024", "July 2024", "August 2024"], statusOpen: "We are Open!", statusClosed: "Service closed", tableTitle: "Business Hours", thDays: "Days", thHours: "Hours", tdMonTue: "Mon - Tue", tdWedSun: "Wed - Sun", tdClosed: "CLOSED", closedMsg: "Service closed Mon-Tue", meetingPoint: "The meeting point is at the pier entrance" },
+        it: { langLabel: "Lingua:", title: "🐾 Dog Sitting Luxury", lblFullname: "Nome e Cognome", lblPhone: "Numero di Telefono", lblDuration: "Durata", opt1h: "1 ora", opt2h: "2 ore", opt3h: "3 ore", lblDogs: "Cani", opt1d: "1 cane", opt2d: "2 cani", dog1Place: "Nome del cane", dog2Place: "Nome del secondo cane", lblDate: "Giorno", lblStartTime: "Ora d'inizio", lblPort: "Porto", lblPontile: "Pontile", lblNotes: "Note", btnSubmit: "Invia Modulo", successTitle: "Prenotazione Inviata!", btnPdf: "Scarica Resoconto PDF", timeErrorMsg: "Errore: Servizio attivo solo 09:30-12:30 e 15:30-18:30", months: ["Giugno 2024", "Luglio 2024", "Agosto 2024"], statusOpen: "Siamo Aperti!", statusClosed: "Servizio chiuso", tableTitle: "Orari del Servizio", thDays: "Giorni", thHours: "Orari", tdMonTue: "Lun - Mar", tdWedSun: "Mer - Dom", tdClosed: "CHIUSO", closedMsg: "Servizio chiuso Lunedì e Martedì", meetingPoint: "Il punto di ritrovo è all'inizio del pontile" }
     };
 
     let currentLang = 'en';
@@ -135,20 +149,20 @@
         document.getElementById('dog2').placeholder = t.dog2Place;
         document.getElementById('lblDate').innerText = t.lblDate;
         document.getElementById('lblStartTime').innerText = t.lblStartTime;
-        document.getElementById('lblMarina').innerText = t.lblMarina;
+        document.getElementById('lblPort').innerText = t.lblPort;
         document.getElementById('lblPontile').innerText = t.lblPontile;
         document.getElementById('lblNotes').innerText = t.lblNotes;
         document.getElementById('btnSubmit').innerText = t.btnSubmit;
         document.getElementById('successTitle').innerText = t.successTitle;
         document.getElementById('btnPdf').innerText = t.btnPdf;
+        document.getElementById('meetingInfo').innerText = t.meetingPoint;
         document.getElementById('tableTitle').innerText = t.tableTitle;
         document.getElementById('thDays').innerText = t.thDays;
         document.getElementById('thHours').innerText = t.thHours;
         document.getElementById('tdMonTue').innerText = t.tdMonTue;
         document.getElementById('tdWedSun').innerText = t.tdWedSun;
         document.getElementById('tdClosed').innerText = t.tdClosed;
-        checkStatus();
-        renderCalendar();
+        checkStatus(); renderCalendar();
     }
 
     function renderCalendar() {
@@ -162,20 +176,10 @@
         ['L','M','M','G','V','S','D'].forEach(d => grid.innerHTML += `<div class="day header">${d}</div>`);
         for(let i=0; i<m.o; i++) grid.innerHTML += `<div class="day empty"></div>`;
         for(let d=1; d<=m.d; d++) {
-            const dayDiv = document.createElement('div');
-            dayDiv.className = 'day';
-            dayDiv.innerText = d;
+            const dayDiv = document.createElement('div'); dayDiv.className = 'day'; dayDiv.innerText = d;
             const dw = (m.o + d - 1) % 7;
-            if(dw === 0 || dw === 1) {
-                dayDiv.classList.add('disabled');
-                dayDiv.onclick = () => alert(t.closedMsg);
-            } else {
-                dayDiv.onclick = function() {
-                    document.querySelectorAll('.day').forEach(el => el.classList.remove('selected'));
-                    dayDiv.classList.add('selected');
-                    document.getElementById('selectedDate').value = `${d} ${t.months[currentMonthIdx]}`;
-                };
-            }
+            if(dw === 0 || dw === 1) { dayDiv.classList.add('disabled'); dayDiv.onclick = () => alert(t.closedMsg); } 
+            else { dayDiv.onclick = function() { document.querySelectorAll('.day').forEach(el => el.classList.remove('selected')); dayDiv.classList.add('selected'); document.getElementById('selectedDate').value = `${d} ${t.months[currentMonthIdx]}`; }; }
             grid.appendChild(dayDiv);
         }
     }
@@ -188,74 +192,38 @@
         const selectedDate = document.getElementById('selectedDate').value;
         const startTime = document.getElementById('startTime').value;
         const errorDiv = document.getElementById('timeError');
-
         if(!selectedDate) return alert(currentLang === 'it' ? "Scegli un giorno!" : "Select a date!");
-
         const timeParts = startTime.split(':');
         const hour = parseInt(timeParts[0]) + (parseInt(timeParts[1]) / 60);
         const isTimeValid = (hour >= 9.5 && hour <= 12.5) || (hour >= 15.5 && hour <= 18.5);
-
-        if(!isTimeValid) {
-            errorDiv.innerText = t.timeErrorMsg;
-            errorDiv.style.display = 'block';
-            document.getElementById('startTime').style.borderColor = 'var(--danger-color)';
-            return;
-        } else {
-            errorDiv.style.display = 'none';
-            document.getElementById('startTime').style.borderColor = '#ddd';
-        }
-
+        if(!isTimeValid) { errorDiv.innerText = t.timeErrorMsg; errorDiv.style.display = 'block'; document.getElementById('startTime').style.borderColor = 'var(--danger-color)'; return; } 
+        else { errorDiv.style.display = 'none'; document.getElementById('startTime').style.borderColor = '#ddd'; }
         const duration = document.getElementById('duration').value;
         const price = duration == "1" ? "10€" : duration == "2" ? "20€" : "25€";
-        
-        const formData = {
-            fullname: document.getElementById('fullname').value,
-            phone: document.getElementById('phone').value,
-            duration: duration + " ore",
-            dogCount: document.getElementById('dogCount').value,
-            dogNames: document.getElementById('dog1').value + (document.getElementById('dog2').value ? ", " + document.getElementById('dog2').value : ""),
-            selectedDate: selectedDate,
-            startTime: startTime,
-            marina: document.getElementById('marina').value,
-            pontile: document.getElementById('pontile').value,
-            notes: document.getElementById('notes').value,
-            price: price
-        };
-
+        const formData = { fullname: document.getElementById('fullname').value, phone: document.getElementById('phone').value, duration: duration + " ore", dogCount: document.getElementById('dogCount').value, dogNames: document.getElementById('dog1').value + (document.getElementById('dog2').value ? ", " + document.getElementById('dog2').value : ""), selectedDate: selectedDate, startTime: startTime, marina: document.getElementById('port').value, pontile: document.getElementById('pontile').value, notes: document.getElementById('notes').value, price: price };
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwPP-RM3qo2VcTal_xfk-ZfqwxO5UDOWInyXcOf8RKoDe1NXwH_ByjI3B91eMjdHtJj/exec';
-
-        try {
-            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(formData) });
-            document.getElementById('finalPrice').innerText = price;
-            document.getElementById('successModal').style.display = 'flex';
-        } catch (e) { alert("Error sending!"); }
+        try { await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(formData) }); document.getElementById('finalPrice').innerText = price; document.getElementById('successModal').style.display = 'flex'; } 
+        catch (e) { alert("Error sending!"); }
     }
 
     function downloadPDF() {
-        const content = `
-BOOKING REPORT - DOG SITTING LUXURY
-------------------------------------------
-Client: ${document.getElementById('fullname').value}
-Phone: ${document.getElementById('phone').value}
-Date: ${document.getElementById('selectedDate').value}
-Start Time: ${document.getElementById('startTime').value}
-Duration: ${document.getElementById('duration').value} hour(s)
-Dogs: ${document.getElementById('dogCount').value} (${document.getElementById('dog1').value}${document.getElementById('dog2').value ? ', ' + document.getElementById('dog2').value : ''})
-Marina: ${document.getElementById('marina').value}
-Pier: ${document.getElementById('pontile').value}
-Price: ${document.getElementById('finalPrice').innerText}
-------------------------------------------
-Thank you for choosing Dog Sitting Luxury!
-        `;
-        const blob = new Blob([content], { type: 'text/plain' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Booking_${document.getElementById('fullname').value}.txt`;
-        link.click();
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const t = translations[currentLang];
+        doc.setFontSize(22); doc.setTextColor(74, 124, 89); doc.text("DOG SITTING LUXURY", 105, 20, { align: "center" });
+        doc.setFontSize(16); doc.setTextColor(0, 0, 0); doc.text(t.successTitle.toUpperCase(), 105, 35, { align: "center" });
+        doc.setDrawColor(212, 163, 115); doc.line(20, 40, 190, 40);
+        doc.setFontSize(12); let y = 55;
+        const data = [ [t.lblFullname, document.getElementById('fullname').value], [t.lblPhone, document.getElementById('phone').value], [t.lblDate, document.getElementById('selectedDate').value], [t.lblStartTime, document.getElementById('startTime').value], [t.lblDuration, document.getElementById('duration').value + (currentLang === 'it' ? ' ore' : ' hour(s)')], [t.lblDogs, document.getElementById('dogCount').value + " (" + document.getElementById('dog1').value + (document.getElementById('dog2').value ? ', ' + document.getElementById('dog2').value : '') + ")"], [t.lblPort, document.getElementById('port').value], [t.lblPontile, document.getElementById('pontile').value], ["PRICE / PREZZO", document.getElementById('finalPrice').innerText] ];
+        data.forEach(line => { doc.setFont("helvetica", "bold"); doc.text(line[0] + ":", 20, y); doc.setFont("helvetica", "normal"); doc.text(line[1], 70, y); y += 10; });
+        
+        y += 5; doc.setFont("helvetica", "bold"); doc.setTextColor(74, 124, 89); doc.text(t.meetingPoint, 20, y);
+        
+        if(document.getElementById('notes').value) { y += 10; doc.setFont("helvetica", "bold"); doc.setTextColor(0,0,0); doc.text(t.lblNotes + ":", 20, y); doc.setFont("helvetica", "normal"); doc.text(document.getElementById('notes').value, 20, y + 7, { maxWidth: 170 }); }
+        doc.setFontSize(10); doc.setTextColor(150); const footer = currentLang === 'it' ? 'Grazie per aver scelto Dog Sitting Luxury!' : 'Thank you for choosing Dog Sitting Luxury!'; doc.text(footer, 105, 280, { align: "center" });
+        doc.save(`Booking_Luxury_${document.getElementById('fullname').value}.pdf`);
     }
-
-    changeLanguage();
-    setInterval(checkStatus, 60000);
+    changeLanguage(); setInterval(checkStatus, 60000);
 </script>
 </body>
 </html>
