@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Sitting Luxury Night</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        :root { --primary: #1a2a6c; --bg: #0b1120; --accent: #fbbf24; --white: #ffffff; --ok: #10b981; --warn: #f59e0b; --no: #ef4444; }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(to bottom, #0b1120, #1a2a6c); 
+            color: #f1f5f9; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px 10px; 
+            margin: 0; 
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- NUVOLE PIÙ VELOCI --- */
+        .clouds-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            filter: blur(20px);
+            animation: moveClouds linear infinite;
+        }
+        /* Velocità aumentata (diminuito il numero di secondi) */
+        .c1 { width: 300px; height: 100px; top: 10%; left: -350px; animation-duration: 15s; }
+        .c2 { width: 450px; height: 150px; top: 40%; left: -500px; animation-duration: 22s; animation-delay: 2s; }
+        .c3 { width: 250px; height: 80px; top: 70%; left: -300px; animation-duration: 18s; animation-delay: 5s; }
+
+        @keyframes moveClouds {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 600px)); }
+        }
+
+        /* --- FIX SELETTORE LINGUA (STILE DARK) --- */
+        .lang-container { align-self: flex-end; margin-bottom: 15px; z-index: 10; }
+        #langSelect { 
+            background: #1a2a6c; /* Sfondo scuro come il tema */
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.4); 
+            border-radius: 20px; 
+            padding: 8px 15px; 
+            cursor: pointer;
+            appearance: none; /* Rimuove lo stile standard del browser */
+            -webkit-appearance: none;
+            outline: none;
+        }
+        /* Stile opzioni all'interno del dropdown */
+        #langSelect option {
+            background: #1a2a6c;
+            color: white;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .status-box { width: 100%; max-width: 500px; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 10px; font-weight: bold; box-sizing: border-box; background: rgba(0,0,0,0.3); }
+        .status-open { color: var(--ok); border: 2px solid var(--ok); }
+        .status-closed-book { color: var(--warn); border: 2px solid var(--warn); }
+
+        .hours-table { width: 100%; max-width: 500px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; backdrop-filter: blur(5px); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { color: var(--accent); text-align: left; padding-bottom: 5px; }
+        td { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        .container { background: var(--white); color: #333; padding: 25px; border-radius: 20px; max-width: 500px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5; }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 22px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; font-family: inherit; box-sizing: border-box; }
+        .input-error { border: 2px solid var(--no) !important; background-color: #fff5f5; animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+        .day { padding: 8px; text-align: center; background: #f8fafc; border-radius: 5px; cursor: pointer; font-size: 11px; }
+        .day.selected { background: var(--primary) !important; color: white !important; font-weight: bold; }
+        .day.header { font-weight: bold; color: #64748b; }
+        .day.closed { color: var(--no); background: #fee2e2; cursor: not-allowed; }
+
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 50px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; margin-top: 10px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; color: #333; }
+        
+        .progress-container { display: none; width: 100%; background: #eee; border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        .progress-bar { width: 0%; height: 10px; background: var(--primary); transition: width 0.3s; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="clouds-container">
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+        <div class="cloud c3"></div>
+    </div>
+
+    <div class="lang-container">
+        <select id="langSelect" onchange="changeLanguage()">
+            <option value="it">Italiano 🇮🇹</option>
+            <option value="en">English 🇬🇧</option>
+        </select>
+    </div>
+
+    <div id="statusBox" class="status-box"></div>
+
+    <div class="hours-table">
+        <table>
+            <thead>
+                <tr><th id="thDays">Giorni</th><th id="thHours">Orari</th></tr>
+            </thead>
+            <tbody>
+                <tr><td id="rowMT">Lun - Mar</td><td style="color:var(--no); font-weight:bold;" id="rowClosed">CHIUSO</td></tr>
+                <tr><td id="rowWS">Mer - Dom</td><td>19:30 - 22:30</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container">
+        <h1 id="title">🌙 Dog Sitting Notturno</h1>
+        <form id="nightForm">
+            <div class="form-group"><label id="l1">Nome e Cognome</label><input type="text" id="fullname" required></div>
+            <div class="form-group"><label id="l2">Telefono</label><input type="tel" id="phone" required></div>
+            <div class="form-group"><label id="l3">Durata</label><select id="duration"><option value="1">1 ora - 20€</option><option value="2">2 ore - 30€</option><option value="3">3 ore - 35€</option></select></div>
+            <div class="form-group"><label id="l4">Numero Cani</label><select id="dogCount" onchange="toggleDogs()"><option value="1">1</option><option value="2">2</option></select></div>
+            <div class="form-group"><input type="text" id="dog1" placeholder="Nome cane" required></div>
+            <div id="extraDog" class="form-group hidden"><input type="text" id="dog2" placeholder="Secondo cane"></div>
+            
+            <div class="form-group">
+                <label id="l5">Scegli la notte</label>
+                <div id="monthLabel" style="text-align:center; font-weight:bold; margin-bottom: 5px; color: var(--primary);">Giugno 2026</div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+                <input type="hidden" id="selectedDate">
+            </div>
+
+            <div class="form-group">
+                <label id="l6">Ora d'inizio (19:30 - 22:30)</label>
+                <input type="time" id="startTime" required onchange="this.classList.remove('input-error')">
+            </div>
+
+            <div class="form-group"><label id="l7">Porto</label><input type="text" id="marina" required></div>
+            <div class="form-group"><label id="l8">Pontile</label><input type="text" id="pontile" required></div>
+            <div class="form-group"><label id="l9">Note</label><textarea id="notes" rows="1"></textarea></div>
+            
+            <div class="progress-container" id="progressContainer"><div class="progress-bar" id="progressBar"></div></div>
+            <button type="button" id="btn" class="btn-submit" onclick="send()">Prenota Ora</button>
+        </form>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="mTitle">Inviata!</h2>
+            <p id="mSub">La tua prenotazione è confermata.</p>
+            <p id="mMeeting" style="background: #fef3c7; padding: 10px; border-radius: 10px; color: #92400e; font-weight: 600; font-size: 14px; margin: 15px 0; border: 1px solid #fcd34d;">📍 Punto di ritrovo: entrata del pontile</p>
+            <div id="pDisp" style="font-size:32px; font-weight:bold; color:var(--primary); margin:10px;"></div>
+            <button class="btn-submit" onclick="downloadPDF()" style="background:var(--ok); margin-bottom:10px;">📄 Scarica PDF</button>
+            <button class="btn-submit" onclick="location.reload()" style="background:#666;">Chiudi</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <script>
+        const url = 'https://script.google.com/macros/s/AKfycbwPP-RM3qo2VcTal_xfk-ZfqwxO5UDOWInyXcOf8RKoDe1NXwH_ByjI3B91eMjdHtJj/exec';
+        const iti = window.intlTelInput(document.querySelector("#phone"), { initialCountry: "it", separateDialCode: true, utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js" });
+
+        const trans = {
+            en: { title:"🌙 Dog Sitting Night", l1:"Full Name", l2:"Phone", l3:"Duration", l4:"Dogs", l5:"Choose Night", l6:"Start Time (19:30 - 22:30)", l7:"Port", l8:"Pier", l9:"Notes", btn:"Book Now", month:"June 2026", open:"SERVICE OPEN 🌙", closedBook:"SERVICE CLOSED - BOOK ANYWAY", mTitle:"Sent!", mSub:"Confirmed!", mMeeting:"📍 Meeting point: Pier entrance", alertC:"Closed Mon-Tue", timeErr:"Service available 19:30-22:30", thDays:"Days", thHours:"Hours", rowMT:"Mon-Tue", rowWS:"Wed-Sun", rowClosed:"CLOSED", pickD:"Pick a date!" },
+            it: { title:"🌙 Dog Sitting Notturno", l1:"Nome e Cognome", l2:"Telefono", l3:"Durata", l4:"Numero Cani", l5:"Scegli la notte", l6:"Ora d'inizio (19:30 - 22:30)", l7:"Porto", l8:"Pontile", l9:"Note", btn:"Prenota Ora", month:"Giugno 2026", open:"SERVIZIO APERTO 🌙", closedBook:"SERVIZIO CHIUSO - PRENOTA PURE", mTitle:"Inviata!", mSub:"Confermata!", mMeeting:"📍 Punto di ritrovo: entrata del pontile", alertC:"Chiuso Lun-Mar", timeErr:"Servizio disponibile 19:30-22:30", thDays:"Giorni", thHours:"Orari", rowMT:"Lun-Mar", rowWS:"Mer-Dom", rowClosed:"CHIUSO", pickD:"Scegli una data!" }
+        };
+
+        let currentLang = 'it';
+        function toggleDogs() { document.getElementById('extraDog').classList.toggle('hidden', document.getElementById('dogCount').value==='1'); }
+        
+        function changeLanguage() {
+            currentLang = document.getElementById('langSelect').value;
+            const t = trans[currentLang];
+            document.getElementById('title').innerText = t.title;
+            document.getElementById('l1').innerText = t.l1; document.getElementById('l2').innerText = t.l2;
+            document.getElementById('l3').innerText = t.l3; document.getElementById('l4').innerText = t.l4;
+            document.getElementById('l5').innerText = t.l5; document.getElementById('l6').innerText = t.l6;
+            document.getElementById('l7').innerText = t.l7; document.getElementById('l8').innerText = t.l8;
+            document.getElementById('l9').innerText = t.l9; document.getElementById('btn').innerText = t.btn;
+            document.getElementById('monthLabel').innerText = t.month;
+            document.getElementById('mTitle').innerText = t.mTitle; document.getElementById('mSub').innerText = t.mSub;
+            document.getElementById('mMeeting').innerText = t.mMeeting;
+            document.getElementById('thDays').innerText = t.thDays; document.getElementById('thHours').innerText = t.thHours;
+            document.getElementById('rowMT').innerText = t.rowMT; document.getElementById('rowWS').innerText = t.rowWS;
+            document.getElementById('rowClosed').innerText = t.rowClosed;
+            updateStatus(); buildCalendar();
+        }
+
+        function updateStatus() {
+            const now = new Date(); const d = now.getDay(); const h = now.getHours() + now.getMinutes()/60;
+            const open = (d !== 1 && d !== 2) && (h >= 19.5 && h <= 22.5);
+            const box = document.getElementById('statusBox');
+            if (open) { box.innerText = trans[currentLang].open; box.className = "status-box status-open"; }
+            else { box.innerText = trans[currentLang].closedBook; box.className = "status-box status-closed-book"; }
+        }
+
+        function buildCalendar() {
+            const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
+            const heads = currentLang === 'it' ? ['L','M','M','G','V','S','D'] : ['M','T','W','T','F','S','S'];
+            heads.forEach(h => grid.innerHTML += `<div class="day header">${h}</div>`);
+            for(let i=1; i<=30; i++) {
+                const div = document.createElement('div'); div.className = 'day'; div.innerText = i;
+                const dw = new Date(2026, 5, i).getDay();
+                if(dw === 1 || dw === 2) { div.classList.add('closed'); div.onclick = () => alert(trans[currentLang].alertC); }
+                else { div.onclick = () => { document.querySelectorAll('.day').forEach(d=>d.classList.remove('selected')); div.classList.add('selected'); document.getElementById('selectedDate').value = i + " " + trans[currentLang].month; }; }
+                grid.appendChild(div);
+            }
+        }
+
+        function send() {
+            const timeIn = document.getElementById('startTime');
+            if(!timeIn.value) { timeIn.classList.add('input-error'); return; }
+            const [hrs, mins] = timeIn.value.split(':').map(Number);
+            const total = hrs * 60 + mins;
+            if(total < 1170 || total > 1350) { alert(trans[currentLang].timeErr); timeIn.classList.add('input-error'); return; }
+            if(!document.getElementById('selectedDate').value) { alert(trans[currentLang].pickD); return; }
+
+            const btn = document.getElementById('btn');
+            btn.disabled = true;
+            document.getElementById('progressContainer').style.display = 'block';
+            let w = 0; const iv = setInterval(() => { if(w>=90) clearInterval(iv); else { w+=10; document.getElementById('progressBar').style.width = w+'%'; } }, 150);
+
+            const payload = {
+                fullname: document.getElementById('fullname').value,
+                phone: iti.getNumber(),
+                duration: document.getElementById('duration').value + "h",
+                dogCount: document.getElementById('dogCount').value,
+                dogNames: document.getElementById('dog1').value + (document.getElementById('dog2').value ? ", " + document.getElementById('dog2').value : ""),
+                selectedDate: document.getElementById('selectedDate').value,
+                startTime: timeIn.value,
+                marina: document.getElementById('marina').value,
+                pontile: document.getElementById('pontile').value,
+                notes: document.getElementById('notes').value,
+                price: document.getElementById('duration').options[document.getElementById('duration').selectedIndex].text.split('-')[1].trim()
+            };
+
+            fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+            .then(() => { 
+                document.getElementById('progressBar').style.width = '100%';
+                setTimeout(() => { document.getElementById('pDisp').innerText = payload.price; document.getElementById('modal').style.display = 'flex'; }, 500);
+            });
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.setFontSize(22); doc.setTextColor(26, 42, 108); doc.text("Luxury Dog Sitting - Night", 20, 30);
+            doc.setLineWidth(0.5); doc.line(20, 35, 190, 35);
+            doc.setFontSize(12); doc.setTextColor(0,0,0);
+            let y = 50;
+            const rows = [["Cliente:", document.getElementById('fullname').value], ["Data:", document.getElementById('selectedDate').value], ["Ora:", document.getElementById('startTime').value], ["Prezzo:", document.getElementById('pDisp').innerText], ["Meeting Point:", trans[currentLang].mMeeting]];
+            rows.forEach(r => { doc.text(r[0]+" "+r[1], 20, y); y+=10; });
+            doc.save("Booking_Night.pdf");
+        }
+
+        window.onload = changeLanguage;
+    </script>
+</body>
+</html>
