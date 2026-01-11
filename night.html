@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dog Sitting Luxury Night</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
@@ -11,21 +11,29 @@
     <style>
         :root { --primary: #1a2a6c; --bg: #0b1120; --accent: #fbbf24; --white: #ffffff; --ok: #10b981; --warn: #f59e0b; --no: #ef4444; }
         
+        /* FIX SFONDO MOBILE */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: linear-gradient(to bottom, #0b1120, #1a2a6c); 
+            background: #0b1120; /* Colore base per evitare buchi bianchi */
+            background: linear-gradient(to bottom, #0b1120 0%, #1a2a6c 100%) no-repeat fixed; 
+            background-size: cover;
             color: #f1f5f9; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             padding: 20px 10px; 
-            margin: 0; 
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
         }
 
-        /* --- NUVOLE PIÙ VELOCI --- */
+        /* --- NUVOLE OTTIMIZZATE --- */
         .clouds-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -37,70 +45,62 @@
             position: absolute;
             background: rgba(255, 255, 255, 0.08);
             border-radius: 100px;
-            filter: blur(20px);
+            filter: blur(15px);
             animation: moveClouds linear infinite;
         }
-        /* Velocità aumentata (diminuito il numero di secondi) */
-        .c1 { width: 300px; height: 100px; top: 10%; left: -350px; animation-duration: 15s; }
-        .c2 { width: 450px; height: 150px; top: 40%; left: -500px; animation-duration: 22s; animation-delay: 2s; }
-        .c3 { width: 250px; height: 80px; top: 70%; left: -300px; animation-duration: 18s; animation-delay: 5s; }
+        .c1 { width: 200px; height: 60px; top: 10%; left: -250px; animation-duration: 12s; }
+        .c2 { width: 300px; height: 90px; top: 35%; left: -350px; animation-duration: 18s; animation-delay: 2s; }
+        .c3 { width: 180px; height: 50px; top: 65%; left: -200px; animation-duration: 15s; animation-delay: 4s; }
 
         @keyframes moveClouds {
-            from { transform: translateX(0); }
-            to { transform: translateX(calc(100vw + 600px)); }
+            from { transform: translateX(-100px); }
+            to { transform: translateX(calc(100vw + 400px)); }
         }
 
-        /* --- FIX SELETTORE LINGUA (STILE DARK) --- */
-        .lang-container { align-self: flex-end; margin-bottom: 15px; z-index: 10; }
+        /* --- SELETTORE LINGUA DARK --- */
+        .lang-container { align-self: flex-end; margin-bottom: 15px; z-index: 10; width: auto; }
         #langSelect { 
-            background: #1a2a6c; /* Sfondo scuro come il tema */
-            color: white; 
-            border: 1px solid rgba(255,255,255,0.4); 
-            border-radius: 20px; 
-            padding: 8px 15px; 
-            cursor: pointer;
-            appearance: none; /* Rimuove lo stile standard del browser */
-            -webkit-appearance: none;
-            outline: none;
-        }
-        /* Stile opzioni all'interno del dropdown */
-        #langSelect option {
             background: #1a2a6c;
-            color: white;
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.5); 
+            border-radius: 20px; 
+            padding: 6px 12px; 
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
         }
 
         /* --- UI ELEMENTS --- */
-        .status-box { width: 100%; max-width: 500px; padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 10px; font-weight: bold; box-sizing: border-box; background: rgba(0,0,0,0.3); }
+        .status-box { width: 100%; max-width: 500px; padding: 12px; border-radius: 15px; text-align: center; margin-bottom: 10px; font-weight: bold; box-sizing: border-box; background: rgba(0,0,0,0.4); font-size: 14px; }
         .status-open { color: var(--ok); border: 2px solid var(--ok); }
         .status-closed-book { color: var(--warn); border: 2px solid var(--warn); }
 
-        .hours-table { width: 100%; max-width: 500px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; backdrop-filter: blur(5px); }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .hours-table { width: 100%; max-width: 500px; background: rgba(255,255,255,0.07); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th { color: var(--accent); text-align: left; padding-bottom: 5px; }
-        td { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        td { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        .container { background: var(--white); color: #333; padding: 25px; border-radius: 20px; max-width: 500px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5; }
-        h1 { color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 22px; }
+        .container { background: var(--white); color: #333; padding: 20px; border-radius: 20px; max-width: 500px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5; }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 15px; font-size: 20px; }
         
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; font-family: inherit; box-sizing: border-box; }
-        .input-error { border: 2px solid var(--no) !important; background-color: #fff5f5; animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
-        .day { padding: 8px; text-align: center; background: #f8fafc; border-radius: 5px; cursor: pointer; font-size: 11px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; font-family: inherit; box-sizing: border-box; -webkit-appearance: none; }
+        
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+        .day { padding: 6px; text-align: center; background: #f1f5f9; border-radius: 5px; cursor: pointer; font-size: 10px; }
         .day.selected { background: var(--primary) !important; color: white !important; font-weight: bold; }
-        .day.header { font-weight: bold; color: #64748b; }
-        .day.closed { color: var(--no); background: #fee2e2; cursor: not-allowed; }
+        .day.header { font-weight: bold; color: #64748b; background: transparent; }
+        .day.closed { color: var(--no); background: #fee2e2; opacity: 0.5; }
 
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 50px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; margin-top: 10px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 100%; color: #333; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 50px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; margin-top: 10px; -webkit-tap-highlight-color: transparent; }
         
-        .progress-container { display: none; width: 100%; background: #eee; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        .progress-bar { width: 0%; height: 10px; background: var(--primary); transition: width 0.3s; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
+        .modal-content { background: white; padding: 20px; border-radius: 20px; text-align: center; max-width: 100%; width: 100%; color: #333; box-sizing: border-box; }
         .hidden { display: none; }
+        
+        .progress-container { display: none; width: 100%; background: #eee; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .progress-bar { width: 0%; height: 8px; background: var(--primary); transition: width 0.3s; }
     </style>
 </head>
 <body>
@@ -144,7 +144,7 @@
             
             <div class="form-group">
                 <label id="l5">Scegli la notte</label>
-                <div id="monthLabel" style="text-align:center; font-weight:bold; margin-bottom: 5px; color: var(--primary);">Giugno 2026</div>
+                <div id="monthLabel" style="text-align:center; font-weight:bold; font-size: 14px; margin-bottom: 5px; color: var(--primary);">Giugno 2026</div>
                 <div class="calendar-grid" id="calendarGrid"></div>
                 <input type="hidden" id="selectedDate">
             </div>
@@ -166,7 +166,6 @@
     <div id="modal" class="modal">
         <div class="modal-content">
             <h2 id="mTitle">Inviata!</h2>
-            <p id="mSub">La tua prenotazione è confermata.</p>
             <p id="mMeeting" style="background: #fef3c7; padding: 10px; border-radius: 10px; color: #92400e; font-weight: 600; font-size: 14px; margin: 15px 0; border: 1px solid #fcd34d;">📍 Punto di ritrovo: entrata del pontile</p>
             <div id="pDisp" style="font-size:32px; font-weight:bold; color:var(--primary); margin:10px;"></div>
             <button class="btn-submit" onclick="downloadPDF()" style="background:var(--ok); margin-bottom:10px;">📄 Scarica PDF</button>
@@ -180,8 +179,8 @@
         const iti = window.intlTelInput(document.querySelector("#phone"), { initialCountry: "it", separateDialCode: true, utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js" });
 
         const trans = {
-            en: { title:"🌙 Dog Sitting Night", l1:"Full Name", l2:"Phone", l3:"Duration", l4:"Dogs", l5:"Choose Night", l6:"Start Time (19:30 - 22:30)", l7:"Port", l8:"Pier", l9:"Notes", btn:"Book Now", month:"June 2026", open:"SERVICE OPEN 🌙", closedBook:"SERVICE CLOSED - BOOK ANYWAY", mTitle:"Sent!", mSub:"Confirmed!", mMeeting:"📍 Meeting point: Pier entrance", alertC:"Closed Mon-Tue", timeErr:"Service available 19:30-22:30", thDays:"Days", thHours:"Hours", rowMT:"Mon-Tue", rowWS:"Wed-Sun", rowClosed:"CLOSED", pickD:"Pick a date!" },
-            it: { title:"🌙 Dog Sitting Notturno", l1:"Nome e Cognome", l2:"Telefono", l3:"Durata", l4:"Numero Cani", l5:"Scegli la notte", l6:"Ora d'inizio (19:30 - 22:30)", l7:"Porto", l8:"Pontile", l9:"Note", btn:"Prenota Ora", month:"Giugno 2026", open:"SERVIZIO APERTO 🌙", closedBook:"SERVIZIO CHIUSO - PRENOTA PURE", mTitle:"Inviata!", mSub:"Confermata!", mMeeting:"📍 Punto di ritrovo: entrata del pontile", alertC:"Chiuso Lun-Mar", timeErr:"Servizio disponibile 19:30-22:30", thDays:"Giorni", thHours:"Orari", rowMT:"Lun-Mar", rowWS:"Mer-Dom", rowClosed:"CHIUSO", pickD:"Scegli una data!" }
+            en: { title:"🌙 Dog Sitting Night", l1:"Full Name", l2:"Phone", l3:"Duration", l4:"Dogs", l5:"Choose Night", l6:"Start Time (19:30 - 22:30)", l7:"Port", l8:"Pier", l9:"Notes", btn:"Book Now", month:"June 2026", open:"SERVICE OPEN 🌙", closedBook:"SERVICE CLOSED - BOOK ANYWAY", mTitle:"Sent!", mMeeting:"📍 Meeting point: Pier entrance", alertC:"Closed Mon-Tue", timeErr:"Service available 19:30-22:30", thDays:"Days", thHours:"Hours", rowMT:"Mon-Tue", rowWS:"Wed-Sun", rowClosed:"CLOSED", pickD:"Pick a date!" },
+            it: { title:"🌙 Dog Sitting Notturno", l1:"Nome e Cognome", l2:"Telefono", l3:"Durata", l4:"Numero Cani", l5:"Scegli la notte", l6:"Ora d'inizio (19:30 - 22:30)", l7:"Porto", l8:"Pontile", l9:"Note", btn:"Prenota Ora", month:"Giugno 2026", open:"SERVIZIO APERTO 🌙", closedBook:"SERVIZIO CHIUSO - PRENOTA PURE", mTitle:"Inviata!", mMeeting:"📍 Punto di ritrovo: entrata del pontile", alertC:"Chiuso Lun-Mar", timeErr:"Servizio disponibile 19:30-22:30", thDays:"Giorni", thHours:"Orari", rowMT:"Lun-Mar", rowWS:"Mer-Dom", rowClosed:"CHIUSO", pickD:"Scegli una data!" }
         };
 
         let currentLang = 'it';
@@ -197,7 +196,7 @@
             document.getElementById('l7').innerText = t.l7; document.getElementById('l8').innerText = t.l8;
             document.getElementById('l9').innerText = t.l9; document.getElementById('btn').innerText = t.btn;
             document.getElementById('monthLabel').innerText = t.month;
-            document.getElementById('mTitle').innerText = t.mTitle; document.getElementById('mSub').innerText = t.mSub;
+            document.getElementById('mTitle').innerText = t.mTitle;
             document.getElementById('mMeeting').innerText = t.mMeeting;
             document.getElementById('thDays').innerText = t.thDays; document.getElementById('thHours').innerText = t.thHours;
             document.getElementById('rowMT').innerText = t.rowMT; document.getElementById('rowWS').innerText = t.rowWS;
